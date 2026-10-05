@@ -6,5 +6,8 @@
       "maxDuration": 60,
       "excludeFiles": "{tests/**,.venv/**,dist/**,build/**}"
     }
-  }
+  },
+  "regions": [
+    "sin1"
+  ]
 }
