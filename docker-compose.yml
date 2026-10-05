@@ -1,0 +1,80 @@
+name: nearperk
+x-backend: &backend
+  image: nearperk-backend:local
+  build: ./backend
+  environment: &environment
+    APP_ENV: ${APP_ENV:-development}
+    ALLOWED_HOSTS: '${ALLOWED_HOSTS:-["localhost","127.0.0.1","testserver"]}'
+    MAX_REQUEST_BYTES: ${MAX_REQUEST_BYTES:-65536}
+    REQUEST_BODY_TIMEOUT_SECONDS: ${REQUEST_BODY_TIMEOUT_SECONDS:-10}
+    MUTATION_RATE_LIMIT: ${MUTATION_RATE_LIMIT:-300}
+    BILLING_PROVIDER: ${BILLING_PROVIDER:-disabled}
+    BILLING_WEBHOOK_SECRET: ${BILLING_WEBHOOK_SECRET:-}
+    JWT_SECRET_KEY: ${JWT_SECRET_KEY:-local-development-only-change-this-signing-key}
+    DISCOVERY_RADIUS_KM: ${DISCOVERY_RADIUS_KM:-5}
+    DISCOVERY_MAX_RADIUS_KM: ${DISCOVERY_MAX_RADIUS_KM:-10}
+    OFFER_MODERATION_ENABLED: ${OFFER_MODERATION_ENABLED:-true}
+    REDEMPTION_RATE_LIMIT: ${REDEMPTION_RATE_LIMIT:-100}
+    COOKIE_SECURE: ${COOKIE_SECURE:-false}
+    TRUSTED_PROXY_HOST: frontend
+    DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-nearperk}:${POSTGRES_PASSWORD:-nearperk_local}@postgres:5432/${POSTGRES_DB:-nearperk}
+    CORS_ORIGINS: '${CORS_ORIGINS:-["http://localhost:5173","http://127.0.0.1:5173"]}'
+services:
+  postgres:
+    image: postgis/postgis:16-3.5
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-nearperk}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-nearperk_local}
+      POSTGRES_DB: ${POSTGRES_DB:-nearperk}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-55432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  migrate:
+    <<: *backend
+    command: ["alembic", "upgrade", "head"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+  backend:
+    <<: *backend
+    ports:
+      - "127.0.0.1:${BACKEND_PORT:-8000}:8000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/ready', timeout=5)"]
+      interval: 10s
+      timeout: 6s
+      retries: 10
+  worker:
+    <<: *backend
+    command: ["python", "-m", "app.jobs.worker"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "from pathlib import Path; import time; assert time.time()-float(Path('/home/appuser/.nearperk/worker-heartbeat').read_text()) < 30"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+  frontend:
+    build: ./frontend
+    ports:
+      - "127.0.0.1:${FRONTEND_PORT:-5173}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/ && wget -q -O /dev/null http://127.0.0.1/api/v1/status"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+volumes:
+  postgres_data:

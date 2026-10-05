@@ -1,0 +1,25 @@
+node_modules/
+frontend/dist/
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.egg-info/
+backend/dist/
+.env
+.env.*
+!.env.example
+coverage/
+.DS_Store
+
+*.tsbuildinfo
+
+# Local planning, mockups, documentation and credentials are not shipped.
+*.md
+docs/
+mockup/
+backend/build/
+*.log
+
+.security-tools/
