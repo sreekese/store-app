@@ -8,6 +8,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
     app_env: str = "development"
+    vercel: bool = False
+    cron_secret: SecretStr = SecretStr("")
     allowed_hosts: list[str] = ["localhost", "127.0.0.1", "testserver"]
     max_request_bytes: int = Field(default=65536, ge=1024, le=1048576)
     request_body_timeout_seconds: float = Field(default=10, ge=0.01, le=60)
@@ -33,6 +35,8 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def production_auth(self) -> Self:
+        if self.cron_secret.get_secret_value() and len(self.cron_secret.get_secret_value()) < 32:
+            raise ValueError("CRON_SECRET must be at least 32 characters")
         if not self.allowed_hosts or any(
             not h or "*" in h or "/" in h or ":" in h or h.strip() != h for h in self.allowed_hosts
         ):

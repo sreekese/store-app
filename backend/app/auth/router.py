@@ -30,6 +30,12 @@ def set_cookie(response: Response, raw: str, request: Request) -> None:
 
 def peer(request: Request) -> str:
     host = request.client.host if request.client else "unknown"
+    # VERCEL is injected by the platform, never selected by a request header.
+    if request.app.state.settings.vercel:
+        try:
+            return str(ip_address(request.headers.get("x-vercel-forwarded-for", "")))
+        except ValueError:
+            return host
     trusted = request.app.state.settings.trusted_proxy_host
     forwarded = request.headers.get("x-real-ip")
     if trusted and forwarded:

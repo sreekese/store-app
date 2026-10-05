@@ -29,6 +29,7 @@ from app.coupons.router import router as coupons_router
 from app.coupons.wallet import router as wallet_router
 from app.daily.discovery import router as daily_router
 from app.dashboards.router import router as dashboard_router
+from app.jobs.router import router as jobs_router
 from app.locations.router import router as locations_router
 from app.notifications.router import router as notifications_router
 from app.offers.public import router as public_offers
@@ -53,7 +54,7 @@ class Health(BaseModel):
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or Settings()
-    engine = make_engine(settings.database_url)
+    engine = make_engine(settings.database_url, serverless=settings.vercel)
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
@@ -71,6 +72,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     app.state.engine = engine
     app.state.settings = settings
+    app.include_router(jobs_router)
     app.include_router(analytics_router)
     app.include_router(analytics_events)
     app.include_router(billing_router)

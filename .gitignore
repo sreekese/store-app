@@ -23,3 +23,4 @@ backend/build/
 *.log
 
 .security-tools/
+.vercel/
