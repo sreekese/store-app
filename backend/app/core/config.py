@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
     app_env: str = "development"
     vercel: bool = False
+    vercel_url: str | None = None
     cron_secret: SecretStr = SecretStr("")
     allowed_hosts: list[str] = ["localhost", "127.0.0.1", "testserver"]
     max_request_bytes: int = Field(default=65536, ge=1024, le=1048576)
@@ -44,6 +45,10 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def production_auth(self) -> Self:
+        # Vercel cron targets the exact deployment host, not only the public alias.
+        # This value is platform configuration, never a forwarded request header.
+        if self.vercel and self.vercel_url and self.vercel_url.endswith(".vercel.app"):
+            self.allowed_hosts = list(dict.fromkeys([*self.allowed_hosts, self.vercel_url]))
         if self.cron_secret.get_secret_value() and len(self.cron_secret.get_secret_value()) < 32:
             raise ValueError("CRON_SECRET must be at least 32 characters")
         if not self.allowed_hosts or any(

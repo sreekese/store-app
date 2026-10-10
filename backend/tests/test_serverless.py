@@ -113,3 +113,12 @@ def test_managed_database_urls_use_installed_psycopg_driver(scheme):
     assert settings.database_url == (
         "postgresql+psycopg://example:example@db.example/app?sslmode=require"
     )
+
+
+@pytest.mark.parametrize("vercel", [False, True])
+def test_cron_deployment_host_is_allowed_only_in_vercel_runtime(vercel):
+    settings = Settings(vercel=vercel, vercel_url="store-app-deployment.vercel.app")
+    with TestClient(create_app(settings)) as client:
+        response = client.get("/health", headers={"Host": "store-app-deployment.vercel.app"})
+        assert response.status_code == (200 if vercel else 400)
+        assert client.get("/health", headers={"Host": "unrelated.vercel.app"}).status_code == 400
