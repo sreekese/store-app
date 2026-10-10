@@ -1,5 +1,5 @@
-from sqlalchemy import create_engine
-from sqlalchemy.engine import Engine
+from sqlalchemy import create_engine, event
+from sqlalchemy.engine import Connection, Engine
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.pool import NullPool
 
@@ -11,15 +11,22 @@ class Base(DeclarativeBase):
 def make_engine(url: str, *, serverless: bool = False) -> Engine:
     if serverless:
         # Neon provides external pooling; don't multiply idle pools across functions.
-        return create_engine(
+        engine = create_engine(
             url,
             poolclass=NullPool,
             connect_args={
                 "connect_timeout": 10,
                 "prepare_threshold": None,
-                "options": "-c statement_timeout=5000",
             },
         )
+
+        @event.listens_for(engine, "begin")
+        def transaction_timeout(connection: Connection) -> None:
+            # PgBouncer rejects startup options; a transaction-local setting also
+            # avoids leaking configuration to the next pooled database client.
+            connection.exec_driver_sql("SET LOCAL statement_timeout = 5000")
+
+        return engine
     return create_engine(
         url,
         pool_pre_ping=True,

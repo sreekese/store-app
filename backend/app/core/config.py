@@ -1,7 +1,7 @@
 from typing import Literal, Self
 from urllib.parse import urlsplit
 
-from pydantic import Field, SecretStr, model_validator
+from pydantic import Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -32,6 +32,15 @@ class Settings(BaseSettings):
     login_account_rate_limit: int = Field(default=10, ge=1)
     register_rate_limit: int = Field(default=10, ge=1)
     refresh_rate_limit: int = Field(default=120, ge=1)
+
+    @field_validator("database_url", mode="before")
+    @classmethod
+    def psycopg_url(cls, value: str) -> str:
+        # Managed providers supply standard PostgreSQL URLs; use our installed driver.
+        for prefix in ("postgres://", "postgresql://"):
+            if value.startswith(prefix):
+                return "postgresql+psycopg://" + value[len(prefix) :]
+        return value
 
     @model_validator(mode="after")
     def production_auth(self) -> Self:

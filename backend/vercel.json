@@ -9,5 +9,11 @@
   },
   "regions": [
     "sin1"
+  ],
+  "crons": [
+    {
+      "path": "/api/internal/jobs",
+      "schedule": "30 18 * * *"
+    }
   ]
 }

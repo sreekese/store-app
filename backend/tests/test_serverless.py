@@ -105,3 +105,11 @@ def test_authenticated_scheduler_processes_real_queue(client):
     assert response.status_code == 200
     with Session(client.app.state.engine) as db:
         assert db.scalar(select(Job.status).where(Job.id == job_id)) == "completed"
+
+
+@pytest.mark.parametrize("scheme", ["postgres", "postgresql", "postgresql+psycopg"])
+def test_managed_database_urls_use_installed_psycopg_driver(scheme):
+    settings = Settings(database_url=f"{scheme}://example:example@db.example/app?sslmode=require")
+    assert settings.database_url == (
+        "postgresql+psycopg://example:example@db.example/app?sslmode=require"
+    )
