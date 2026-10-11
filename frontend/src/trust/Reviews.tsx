@@ -1,3 +1,4 @@
+import { useScrollQuery, ScrollMore } from "../lists/ScrollList";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -147,13 +148,13 @@ export default function Reviews({
   storeId: string;
 }) {
   const auth = useAuth(),
-    [offset, setOffset] = useState(0),
     [scope, setScope] = useState("offer");
-  const query = useQuery({
-    queryKey: ["public-reviews", storeId, offerId, scope, offset],
-    queryFn: () =>
+  const query = useScrollQuery({
+    field: "items",
+    queryKey: ["public-reviews", storeId, offerId, scope],
+    queryFn: ({ pageParam }) =>
       raw<Page<Review> & { count: number; average: number | null }>(
-        `/trust/reviews?store_id=${storeId}${scope === "offer" ? `&offer_id=${offerId}` : ""}&offset=${offset}`,
+        `/trust/reviews?store_id=${storeId}${scope === "offer" ? `&offer_id=${offerId}` : ""}&offset=${pageParam}`,
       ),
     retry: false,
   });
@@ -166,7 +167,6 @@ export default function Reviews({
           value={scope}
           onChange={(e) => {
             setScope(e.target.value);
-            setOffset(0);
           }}
         >
           <option value="offer">This offer at this branch</option>
@@ -201,11 +201,7 @@ export default function Reviews({
               )}
             </article>
           ))}
-          <Pager
-            offset={offset}
-            next={query.data.next_offset}
-            change={setOffset}
-          />
+          <ScrollMore query={query} label="reviews" />
         </>
       )}
     </section>

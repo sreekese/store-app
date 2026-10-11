@@ -1,5 +1,6 @@
-import { useRef, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useScrollQuery, ScrollMore } from "../lists/ScrollList";
+import { useRef } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthProvider";
 import { authorized } from "../auth/client";
@@ -40,25 +41,18 @@ export default function DailyCoupons({
   const auth = useAuth(),
     navigate = useNavigate(),
     client = useQueryClient();
-  const [offset, setOffset] = useState(0),
-    keys = useRef<Record<string, string>>({});
-  const query = useQuery({
-    queryKey: [
-      "daily-coupons",
-      auth.user?.id,
-      latitude,
-      longitude,
-      radius,
-      offset,
-    ],
-    queryFn: () =>
+  const keys = useRef<Record<string, string>>({});
+  const query = useScrollQuery({
+    field: "daily_picks",
+    queryKey: ["daily-coupons", auth.user?.id, latitude, longitude, radius],
+    queryFn: ({ pageParam }) =>
       authorized<Result>("/daily/recommendations", {
         method: "POST",
         body: JSON.stringify({
           latitude,
           longitude,
           radius_km: radius,
-          offset,
+          offset: pageParam,
         }),
       }),
     enabled: auth.user?.role === "USER",
@@ -157,18 +151,7 @@ export default function DailyCoupons({
               ordinary offers.
             </p>
           )}
-          <button
-            disabled={!offset}
-            onClick={() => setOffset(Math.max(0, offset - 12))}
-          >
-            Previous picks
-          </button>
-          <button
-            disabled={query.data.next_offset === null}
-            onClick={() => setOffset(query.data!.next_offset!)}
-          >
-            More picks
-          </button>
+          <ScrollMore query={query} label="picks" />
         </>
       )}
     </section>

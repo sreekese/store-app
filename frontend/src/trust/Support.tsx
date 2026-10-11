@@ -1,3 +1,4 @@
+import { useScrollQuery, ScrollMore } from "../lists/ScrollList";
 import { useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -200,11 +201,14 @@ function CaseList({ role }: { role: Role }) {
   const auth = useAuth(),
     [offset, setOffset] = useState(0),
     [status, setStatus] = useState("");
-  const query = useQuery({
+  const query = useScrollQuery({
+    field: "items",
+    scroll: role === "USER",
+    initialOffset: offset,
     queryKey: ["support-cases", auth.user?.id, status, offset],
-    queryFn: () =>
+    queryFn: ({ pageParam }) =>
       authorized<Page<Case>>(
-        `/trust/cases?offset=${offset}${status ? `&status=${status}` : ""}`,
+        `/trust/cases?offset=${pageParam}${status ? `&status=${status}` : ""}`,
       ),
     retry: false,
     gcTime: 0,
@@ -255,11 +259,15 @@ function CaseList({ role }: { role: Role }) {
               <small>{c.reference}</small>
             </article>
           ))}
-          <Pager
-            offset={offset}
-            next={query.data.next_offset}
-            change={setOffset}
-          />
+          {role === "USER" ? (
+            <ScrollMore query={query} label="cases" />
+          ) : (
+            <Pager
+              offset={offset}
+              next={query.data.next_offset}
+              change={setOffset}
+            />
+          )}
         </>
       )}
     </section>
@@ -275,10 +283,15 @@ function CaseDetail({ id, role }: { id: string; role: Role }) {
     retry: false,
     gcTime: 0,
   });
-  const history = useQuery({
+  const history = useScrollQuery({
+    field: "items",
+    scroll: role === "USER",
+    initialOffset: offset,
     queryKey: ["support-history", auth.user?.id, id, offset],
-    queryFn: () =>
-      authorized<Page<Action>>(`/trust/cases/${id}/history?offset=${offset}`),
+    queryFn: ({ pageParam }) =>
+      authorized<Page<Action>>(
+        `/trust/cases/${id}/history?offset=${pageParam}`,
+      ),
     retry: false,
     gcTime: 0,
   });
@@ -387,11 +400,15 @@ function CaseDetail({ id, role }: { id: string; role: Role }) {
                     <small>{new Date(a.created_at).toLocaleString()}</small>
                   </article>
                 ))}
-                <Pager
-                  offset={offset}
-                  next={history.data.next_offset}
-                  change={setOffset}
-                />
+                {role === "USER" ? (
+                  <ScrollMore query={history} label="case history" />
+                ) : (
+                  <Pager
+                    offset={offset}
+                    next={history.data.next_offset}
+                    change={setOffset}
+                  />
+                )}
               </>
             )}
           </section>

@@ -1,3 +1,4 @@
+import { useScrollQuery, ScrollMore } from "../lists/ScrollList";
 import { TrackView } from "../analytics/tracking";
 import { ReviewForm } from "../trust/Reviews";
 import { ReportForm } from "../trust/Support";
@@ -70,20 +71,12 @@ export default function Wallet() {
   const auth = useAuth(),
     [search, setSearch] = useSearchParams();
   const status = states.find((s) => s === search.get("status")) || "ACTIVE";
-  const requestedOffset = Number(search.get("offset") || 0);
-  const offset =
-    Number.isInteger(requestedOffset) &&
-    requestedOffset >= 0 &&
-    requestedOffset <= 10000
-      ? requestedOffset
-      : 0;
-  const setOffset = (value: number) =>
-    setSearch({ status, offset: String(value) });
-  const query = useQuery({
-    queryKey: ["wallet", auth.user?.id, status, offset],
-    queryFn: () =>
+  const query = useScrollQuery({
+    field: "claims",
+    queryKey: ["wallet", auth.user?.id, status],
+    queryFn: ({ pageParam }) =>
       authorized<{ claims: Receipt[]; next_offset: number | null }>(
-        `/shopper/wallet?status=${status}&offset=${offset}&limit=12`,
+        `/shopper/wallet?status=${status}&offset=${pageParam}&limit=12`,
       ),
     retry: false,
     refetchInterval: 30000,
@@ -136,20 +129,7 @@ export default function Wallet() {
               </article>
             ))}
           </div>
-          <div className="form-actions">
-            <button
-              disabled={offset === 0}
-              onClick={() => setOffset(Math.max(0, offset - 12))}
-            >
-              Previous coupons
-            </button>
-            <button
-              disabled={query.data.next_offset === null}
-              onClick={() => setOffset(query.data!.next_offset!)}
-            >
-              More coupons
-            </button>
-          </div>
+          <ScrollMore query={query} label="coupons" />
         </>
       )}
     </Shell>

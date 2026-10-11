@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { raw } from "../auth/client";
 import AdSlot, { AdCard, safeDestination } from "./AdSlot";
-import type { Card } from "./types";
+import type { Card, Placement } from "./types";
 vi.mock("../auth/client", () => ({ raw: vi.fn() }));
 const card: Card = {
   id: "ad1",
@@ -23,7 +23,7 @@ afterEach(() => {
   vi.useRealTimers();
   vi.restoreAllMocks();
 });
-function slot() {
+function slot(placement: Placement = "BELOW_OFFERS") {
   return render(
     <QueryClientProvider
       client={
@@ -32,7 +32,7 @@ function slot() {
         })
       }
     >
-      <AdSlot placement="BELOW_OFFERS" />
+      <AdSlot placement={placement} />
     </QueryClientProvider>,
   );
 }
@@ -118,4 +118,82 @@ it("removes a displayed ad when its server-relative deadline passes", async () =
   clock.mockReturnValue(1100);
   act(() => vi.advanceTimersByTime(1000));
   expect(screen.queryByRole("link")).not.toBeInTheDocument();
+});
+
+it("shows every eligible ad in a placement and excludes other slots and unsafe links", async () => {
+  vi.mocked(raw).mockResolvedValue({
+    server_time: "2029-01-01T00:00:00Z",
+    items: [
+      { ...card, placement: "BELOW_HERO" },
+      { ...card, id: "ad2", sponsor: "Second shop", placement: "BELOW_HERO" },
+      { ...card, id: "ad3", sponsor: "Other slot", placement: "ABOVE_OFFERS" },
+      { ...card, id: "ad4", sponsor: "Unsafe", href: "https://example.com" },
+    ],
+  });
+  slot("BELOW_HERO");
+  expect(
+    await screen.findByLabelText("Sponsored by Second shop"),
+  ).toBeInTheDocument();
+  expect(screen.getByLabelText("Sponsored by Local shop")).toBeInTheDocument();
+  expect(
+    screen.queryByLabelText("Sponsored by Other slot"),
+  ).not.toBeInTheDocument();
+  expect(
+    screen.queryByLabelText("Sponsored by Unsafe"),
+  ).not.toBeInTheDocument();
+  expect(
+    screen.getByRole("region", { name: /scroll horizontally/ }),
+  ).toHaveAttribute("tabindex", "0");
+});
+
+it.each(["BELOW_HERO", "ABOVE_OFFERS"] as const)(
+  "renders the new %s placement",
+  async (placement) => {
+    vi.mocked(raw).mockResolvedValue({
+      server_time: "2029-01-01T00:00:00Z",
+      items: [{ ...card, placement }],
+    });
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <AdSlot placement={placement} />
+      </QueryClientProvider>,
+    );
+    expect(
+      await screen.findByLabelText("Sponsored by Local shop"),
+    ).toBeInTheDocument();
+  },
+);
+
+it("shows one banner at a time and supports dots and touch swipes without arrows", async () => {
+  vi.mocked(raw).mockResolvedValue({
+    server_time: "2029-01-01T00:00:00Z",
+    items: [card, { ...card, id: "ad2", sponsor: "Second shop" }],
+  });
+  slot();
+  await screen.findByLabelText("Sponsored by Local shop");
+  expect(
+    screen.queryByLabelText("Sponsored by Second shop"),
+  ).not.toBeInTheDocument();
+  expect(screen.queryByText("Sponsored discoveries")).not.toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "Show advertisement 2" }));
+  expect(screen.getByLabelText("Sponsored by Second shop")).toBeInTheDocument();
+  expect(
+    screen.queryByLabelText("Sponsored by Local shop"),
+  ).not.toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "Show advertisement 1" }));
+  expect(screen.getByLabelText("Sponsored by Local shop")).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "Show advertisement 2" }));
+  fireEvent.click(screen.getByRole("button", { name: "Show advertisement 1" }));
+  expect(
+    screen.queryByRole("button", { name: "Next advertisement" }),
+  ).not.toBeInTheDocument();
+  expect(
+    screen.queryByRole("button", { name: "Previous advertisement" }),
+  ).not.toBeInTheDocument();
+  const slide = screen.getByLabelText("Sponsored by Local shop");
+  fireEvent.touchStart(slide, { touches: [{ clientX: 250, clientY: 100 }] });
+  fireEvent.touchEnd(slide, {
+    changedTouches: [{ clientX: 80, clientY: 110 }],
+  });
+  expect(screen.getByLabelText("Sponsored by Second shop")).toBeInTheDocument();
 });

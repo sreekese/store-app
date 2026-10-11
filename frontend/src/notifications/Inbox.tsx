@@ -1,3 +1,4 @@
+import { useScrollQuery, ScrollMore } from "../lists/ScrollList";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -95,10 +96,13 @@ export default function Inbox({ role }: { role: Role }) {
     client = useQueryClient(),
     [offset, setOffset] = useState(0),
     [unread, setUnread] = useState(false);
-  const query = useQuery({
+  const query = useScrollQuery({
+    field: "items",
+    scroll: role === "USER",
+    initialOffset: offset,
     queryKey: ["notifications", auth.user?.id, unread, offset],
-    queryFn: () =>
-      authorized<Page>(`/notifications?unread=${unread}&offset=${offset}`),
+    queryFn: ({ pageParam }) =>
+      authorized<Page>(`/notifications?unread=${unread}&offset=${pageParam}`),
     retry: false,
     refetchInterval: 30000,
     gcTime: 0,
@@ -213,18 +217,24 @@ export default function Inbox({ role }: { role: Role }) {
                   )}
                 </article>
               ))}
-              <button
-                disabled={!offset}
-                onClick={() => setOffset(Math.max(0, offset - 20))}
-              >
-                Previous notifications
-              </button>
-              <button
-                disabled={query.data.next_offset === null}
-                onClick={() => setOffset(query.data!.next_offset!)}
-              >
-                More notifications
-              </button>
+              {role === "USER" ? (
+                <ScrollMore query={query} label="notifications" />
+              ) : (
+                <>
+                  <button
+                    disabled={!offset}
+                    onClick={() => setOffset(Math.max(0, offset - 20))}
+                  >
+                    Previous notifications
+                  </button>
+                  <button
+                    disabled={query.data.next_offset === null}
+                    onClick={() => setOffset(query.data!.next_offset!)}
+                  >
+                    More notifications
+                  </button>
+                </>
+              )}
             </>
           )}
         </section>

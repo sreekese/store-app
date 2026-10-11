@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "./auth/AuthProvider";
 import App from "./App";
 import "./styles.css";
+import "./shopper.css";
 const client = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 30000 } },
 });

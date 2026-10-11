@@ -1,4 +1,5 @@
-export type Placement = "BELOW_DAILY" | "BELOW_OFFERS";
+export type Placement =
+  "BELOW_HERO" | "ABOVE_OFFERS" | "BELOW_DAILY" | "BELOW_OFFERS";
 export interface AdFields {
   sponsor: string;
   headline: string;
@@ -36,6 +37,8 @@ export interface Page<T> {
   next_offset: number | null;
 }
 export const placements: Record<Placement, string> = {
+  BELOW_HERO: "Below homepage introduction",
+  ABOVE_OFFERS: "Above the offer list",
   BELOW_DAILY: "Below daily coupons",
   BELOW_OFFERS: "Below nearby offers",
 };

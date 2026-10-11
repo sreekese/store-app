@@ -123,10 +123,23 @@ describe("Sprint 1 account flows", () => {
       await restoreSession();
     });
   });
-  it("shows real platform metadata", async () => {
+  it("keeps the homepage focused on shoppers", async () => {
     mockFetch();
     setup();
-    expect(await screen.findByText("● API connected")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Good things are closer."),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(/API connected|Platform v/),
+    ).not.toBeInTheDocument();
+    expect(
+      document.querySelector(
+        'a[href^="/merchant"], a[href^="/admin"], a[href^="/staff"], a[href^="/superadmin"]',
+      ),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Explore nearby offers" }),
+    ).toHaveAttribute("href", "#discover");
   });
   it.each([
     ["/login", "Shopper"],

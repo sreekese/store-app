@@ -5,7 +5,7 @@ from pydantic import AwareDatetime, Field, field_validator, model_validator
 
 from app.profiles.schemas import Input, MerchantInput
 
-Placement = Literal["BELOW_DAILY", "BELOW_OFFERS"]
+Placement = Literal["BELOW_HERO", "ABOVE_OFFERS", "BELOW_DAILY", "BELOW_OFFERS"]
 Status = Literal["DRAFT", "ENABLED", "DISABLED", "ARCHIVED"]
 
 

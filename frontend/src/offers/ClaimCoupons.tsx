@@ -1,4 +1,5 @@
-import { useRef, useState } from "react";
+import { useScrollQuery, ScrollMore } from "../lists/ScrollList";
+import { useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../auth/AuthProvider";
@@ -29,13 +30,12 @@ export default function ClaimCoupons({
   const navigate = useNavigate();
   const auth = useAuth(),
     client = useQueryClient(),
-    [offset, setOffset] = useState(0),
     keys = useRef<Record<string, string>>({});
-  const list = useQuery({
-    queryKey: ["available-campaigns", offerId, storeId, offset],
-    queryFn: () =>
+  const list = useScrollQuery({
+    queryKey: ["available-campaigns", offerId, storeId],
+    queryFn: ({ pageParam }) =>
       raw<Campaign[]>(
-        `/offers/${offerId}/campaigns?store_id=${encodeURIComponent(storeId)}&offset=${offset}`,
+        `/offers/${offerId}/campaigns?store_id=${encodeURIComponent(storeId)}&offset=${pageParam}`,
       ),
     refetchInterval: 30000,
   });
@@ -150,31 +150,17 @@ export default function ClaimCoupons({
           )}
         </article>
       ))}
-      <div className="form-actions">
-        <button
-          className="text-button"
-          disabled={offset === 0}
-          onClick={() => setOffset(Math.max(0, offset - 25))}
-        >
-          Previous coupons
-        </button>
-        <button
-          className="text-button"
-          disabled={!list.data || list.data.length < 25 || offset >= 10000}
-          onClick={() => setOffset(offset + 25)}
-        >
-          More coupons
-        </button>
-      </div>
+      {list.data && <ScrollMore query={list} label="coupons" />}
     </section>
   );
 }
 export function ClaimReceipts() {
-  const [offset, setOffset] = useState(0),
-    query = useQuery({
-      queryKey: ["claim-receipts", offset],
-      queryFn: () => authorized<Receipt[]>(`/shopper/claims?offset=${offset}`),
-    });
+  const auth = useAuth();
+  const query = useScrollQuery({
+    queryKey: ["claim-receipts", auth.user?.id],
+    queryFn: ({ pageParam }) =>
+      authorized<Receipt[]>(`/shopper/claims?offset=${pageParam}`),
+  });
   return (
     <section className="account-panel">
       <h2>Saved coupon claims</h2>
@@ -205,20 +191,7 @@ export function ClaimReceipts() {
         Your claims are saved in your coupon wallet. Show an active coupon to
         authorized store staff to redeem it.
       </p>
-      <div className="form-actions">
-        <button
-          disabled={offset === 0}
-          onClick={() => setOffset(Math.max(0, offset - 25))}
-        >
-          Previous claims
-        </button>
-        <button
-          disabled={!query.data || query.data.length < 25 || offset >= 10000}
-          onClick={() => setOffset(offset + 25)}
-        >
-          More claims
-        </button>
-      </div>
+      {query.data && <ScrollMore query={query} label="claims" />}
     </section>
   );
 }

@@ -1,16 +1,11 @@
 import { lazy, Suspense } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../auth/AuthProvider";
-import { homePaths } from "../auth/types";
 import { Link } from "react-router-dom";
-import { getPlatformStatus } from "../api/client";
+import NeighbourhoodArt from "../shopper/NeighbourhoodArt";
+const AdSlot = lazy(() => import("../advertisements/AdSlot"));
 const Discover = lazy(() => import("../locations/Discover"));
 export default function Home() {
   const auth = useAuth();
-  const status = useQuery({
-    queryKey: ["platform-status"],
-    queryFn: getPlatformStatus,
-  });
   return (
     <>
       <header className="header">
@@ -18,49 +13,55 @@ export default function Home() {
           <span>✳</span>nearperk.
         </Link>
         <nav aria-label="Main navigation">
-          <a href="#discover">Discover</a>
+          <a href="#discover">Explore</a>
+          <Link to="/app/coupons">My coupons</Link>
           {auth.user?.role === "USER" && (
             <Link to="/app/notifications">Notifications</Link>
           )}
-          <Link to={auth.user ? homePaths[auth.user.role] : "/login"}>
-            {auth.user ? "My account" : "Sign in"}
+          <Link to={auth.user?.role === "USER" ? "/app" : "/login"}>
+            {auth.user?.role === "USER" ? "My account" : "Sign in"}
           </Link>
         </nav>
       </header>
       <main className="container">
-        <div className="intro">
-          <p className="eyebrow">
-            YOUR NEIGHBOURHOOD. A LITTLE MORE REWARDING.
-          </p>
-          <h1>Good things are closer.</h1>
-          <p>Little perks from the places around you.</p>
-        </div>
-        <section className="hero">
-          <div>
-            <p className="eyebrow">LOCAL FEELS REWARDING</p>
-            <h2>
-              A familiar street.
-              <br />A new favourite.
-            </h2>
-            <p>
-              We're getting your neighbourhood ready for nearby offers,
-              <br className="desktop" /> daily coupons, and a little more love
-              for local.
+        <section className="market-hero" aria-labelledby="market-title">
+          <div className="market-hero-copy">
+            <p className="market-kicker">
+              <span aria-hidden="true">✳</span> BIG FINDS. SMALL DISTANCES.
             </p>
-            <a className="button" href="#discover">
-              Explore nearby stores ↗
-            </a>
+            <h1 id="market-title">Good things are closer.</h1>
+            <p className="market-description">
+              Your morning coffee. A fresh look. A little retail therapy.
+              Discover local stores and offers worth stepping out for.
+            </p>
+            <div className="market-hero-actions">
+              <a className="button" href="#discover">
+                Explore nearby stores <span aria-hidden="true">↗</span>
+              </a>
+              <Link className="market-wallet-link" to="/app/coupons">
+                My coupon wallet <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+            <p className="market-hero-note">
+              Find a place. Discover an offer. Make it yours.
+            </p>
           </div>
-          <div className="ticket" aria-hidden="true">
-            <span className="eyebrow">A LITTLE LOVE FOR LOCAL</span>
-            <strong>
-              hello,
-              <br />
-              neighbour.
-            </strong>
-            <div>Good things, just around the corner. ✳</div>
-          </div>
+          <NeighbourhoodArt />
         </section>
+        <div
+          className="market-intro-strip"
+          aria-label="Discover local businesses"
+        >
+          <p>
+            One neighbourhood.
+            <br />
+            <strong>So much to discover.</strong>
+          </p>
+          <span>Food &amp; cafés</span>
+          <span>Fashion &amp; lifestyle</span>
+          <span>Beauty &amp; wellness</span>
+          <span>Everyday essentials</span>
+        </div>
         <Suspense
           fallback={
             <div className="discovery-loading" role="status">
@@ -68,34 +69,9 @@ export default function Home() {
             </div>
           }
         >
+          <AdSlot placement="BELOW_HERO" />
           <Discover />
         </Suspense>
-        <section className="readiness">
-          <div>
-            <p className="eyebrow">YOUR LOCAL ACCOUNT</p>
-            <h2>Your neighbourhood account starts here.</h2>
-            <p>
-              Create an account or sign in to discover offers from local
-              businesses.
-            </p>
-          </div>
-          <div className="status-card" aria-live="polite">
-            {status.isPending ? (
-              <p role="status">Connecting to the platform…</p>
-            ) : status.isError ? (
-              <>
-                <p role="alert">The platform is temporarily unavailable.</p>
-                <button onClick={() => void status.refetch()}>Try again</button>
-              </>
-            ) : (
-              <>
-                <span className="badge">● API connected</span>
-                <h3>{status.data.name}</h3>
-                <p>Platform v{status.data.version}</p>
-              </>
-            )}
-          </div>
-        </section>
         <section className="steps">
           <article>
             <span>01</span>
@@ -123,9 +99,9 @@ export default function Home() {
             might be around the corner.
           </h2>
           <p>We're building a better way to discover local.</p>
-          <Link className="button light" to="/merchant/login">
-            For local businesses ↗
-          </Link>
+          <a className="button light" href="#discover">
+            Find your next local offer
+          </a>
         </section>
       </main>
       <footer>
@@ -138,11 +114,10 @@ export default function Home() {
           </p>
           <Link to="/app/coupons">My coupon wallet</Link>
           <Link to="/app/support">Support</Link>
-          <Link to="/merchant/login">Store owner sign in ↗</Link>
+          <a href="#discover">Explore nearby offers</a>
         </div>
         <div className="footnote">
-          Nearperk · Development build · Offer discovery available · Coupon
-          claiming available
+          Discover local. Support local. Enjoy a little more. · Nearperk
         </div>
       </footer>
     </>

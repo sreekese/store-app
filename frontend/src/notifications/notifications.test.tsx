@@ -129,7 +129,7 @@ it("shows empty and outdated states without following unsafe links", async () =>
     screen.queryByRole("link", { name: "Open details" }),
   ).not.toBeInTheDocument();
 });
-it("renders bounded pagination and an empty inbox", async () => {
+it("keeps earlier notifications when the final page is empty", async () => {
   api.mockImplementation(async (path) =>
     path === "/notifications/preferences"
       ? preferences
@@ -140,8 +140,12 @@ it("renders bounded pagination and an empty inbox", async () => {
   setup();
   fireEvent.click(await screen.findByText("More notifications"));
   expect(
-    await screen.findByText("No notifications here yet."),
+    await screen.findByText("You’re all caught up on notifications."),
   ).toBeInTheDocument();
+  expect(screen.getByText(note.title)).toBeInTheDocument();
+  expect(
+    screen.queryByText("No notifications here yet."),
+  ).not.toBeInTheDocument();
   expect(api).toHaveBeenCalledWith("/notifications?unread=false&offset=20");
 });
 it("exposes retry tools only on the superadmin inbox", async () => {

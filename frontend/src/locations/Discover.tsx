@@ -1,3 +1,4 @@
+import { useScrollQuery, ScrollMore } from "../lists/ScrollList";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { raw } from "../auth/client";
@@ -131,35 +132,29 @@ export default function Discover() {
   });
   const gps = useDeviceLocation();
   const [placeText, setPlaceText] = useState(""),
-    [searchTerm, setSearchTerm] = useState(""),
-    [placePage, setPlacePage] = useState(0);
+    [searchTerm, setSearchTerm] = useState("");
   const [manual, setManual] = useState({ latitude: "", longitude: "" });
   const [centre, setCentre] = useState<
       (Coordinates & { label: string }) | null
     >(null),
-    [radius, setRadius] = useState<number | null>(null),
-    [offset, setOffset] = useState(0);
+    [radius, setRadius] = useState<number | null>(null);
   const [selected, setSelected] = useState<Place | null>(null);
-  const places = useQuery({
-    queryKey: ["discovery-places", searchTerm, placePage],
-    queryFn: () =>
+  const places = useScrollQuery({
+    pageSize: 20,
+    queryKey: ["discovery-places", searchTerm],
+    queryFn: ({ pageParam }) =>
       raw<Place[]>(
-        `/locations/places?q=${encodeURIComponent(searchTerm)}&offset=${placePage}`,
+        `/locations/places?q=${encodeURIComponent(searchTerm)}&offset=${pageParam}`,
       ),
     enabled: searchTerm.length >= 2,
     retry: false,
   });
-  const result = useQuery({
-    queryKey: [
-      "nearby-stores",
-      centre?.latitude,
-      centre?.longitude,
-      radius,
-      offset,
-    ],
-    queryFn: () =>
+  const result = useScrollQuery({
+    field: "stores",
+    queryKey: ["nearby-stores", centre?.latitude, centre?.longitude, radius],
+    queryFn: ({ pageParam }) =>
       raw<Results>(
-        `/locations/nearby?latitude=${centre!.latitude}&longitude=${centre!.longitude}&radius_km=${radius}&offset=${offset}&limit=12`,
+        `/locations/nearby?latitude=${centre!.latitude}&longitude=${centre!.longitude}&radius_km=${radius}&offset=${pageParam}&limit=12`,
       ),
     enabled: !!centre && radius !== null,
     retry: false,
@@ -177,7 +172,7 @@ export default function Discover() {
     gps.cancel();
     setCentre({ ...point, label });
     setRadius(config.data!.default_radius_km);
-    setOffset(0);
+
     setSelected(null);
   }
   return (
@@ -222,9 +217,8 @@ export default function Discover() {
             gps.cancel();
             setSelected(null);
             setSearchTerm(placeText.trim());
-            setPlacePage(0);
-            if (placeText.trim() === searchTerm && placePage === 0)
-              void places.refetch();
+
+            if (placeText.trim() === searchTerm) void places.refetch();
           }}
         >
           <Field
@@ -286,30 +280,7 @@ export default function Discover() {
                 </li>
               ))}
             </ul>
-            {(placePage > 0 || places.data?.length === 20) && (
-              <div className="action-row">
-                <button
-                  className="text-button"
-                  disabled={placePage === 0 || places.isFetching}
-                  onClick={() => {
-                    setSelected(null);
-                    setPlacePage((p) => p - 20);
-                  }}
-                >
-                  Previous places
-                </button>
-                <button
-                  className="text-button"
-                  disabled={places.data?.length !== 20 || places.isFetching}
-                  onClick={() => {
-                    setSelected(null);
-                    setPlacePage((p) => p + 20);
-                  }}
-                >
-                  More places
-                </button>
-              </div>
-            )}
+            {places.data && <ScrollMore query={places} label="places" />}
           </>
         )}
         {selected && (
@@ -414,19 +385,16 @@ export default function Discover() {
                 <div className="notice">
                   <h3>No stores found in this radius.</h3>
                   <p>Choose another place or try again later.</p>
-                  {offset === 0 &&
-                    config.data &&
-                    radius! < config.data.max_radius_km && (
-                      <button
-                        className="button secondary"
-                        onClick={() => {
-                          setRadius(config.data!.max_radius_km);
-                          setOffset(0);
-                        }}
-                      >
-                        Expand to {config.data.max_radius_km} km
-                      </button>
-                    )}
+                  {config.data && radius! < config.data.max_radius_km && (
+                    <button
+                      className="button secondary"
+                      onClick={() => {
+                        setRadius(config.data!.max_radius_km);
+                      }}
+                    >
+                      Expand to {config.data.max_radius_km} km
+                    </button>
+                  )}
                 </div>
               ) : (
                 <div className="discovery-grid">
@@ -435,25 +403,7 @@ export default function Discover() {
                   ))}
                 </div>
               )}
-              <div className="action-row pagination">
-                <button
-                  className="text-button"
-                  disabled={offset === 0 || result.isFetching}
-                  onClick={() => setOffset(Math.max(0, offset - 12))}
-                >
-                  Previous stores
-                </button>
-                <span>Page {offset / 12 + 1}</span>
-                <button
-                  className="text-button"
-                  disabled={
-                    result.data.next_offset === null || result.isFetching
-                  }
-                  onClick={() => setOffset(result.data!.next_offset!)}
-                >
-                  Next stores
-                </button>
-              </div>
+              <ScrollMore query={result} label="stores" />
             </>
           )}
         </>
@@ -468,13 +418,13 @@ export default function Discover() {
             onExpand={() => {
               if (config.data) {
                 setRadius(config.data.max_radius_km);
-                setOffset(0);
               }
             }}
             radius={radius}
           />
         )}
         {centre && radius !== null && <AdSlot placement="BELOW_DAILY" />}
+        <AdSlot placement="ABOVE_OFFERS" />
         <OfferBrowser
           key={`${centre?.latitude ?? "all"}:${centre?.longitude ?? "all"}:${radius}`}
           centre={centre}

@@ -1,3 +1,4 @@
+import { useScrollQuery, ScrollMore } from "../lists/ScrollList";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
@@ -20,14 +21,14 @@ export default function OfferBrowser({
 }) {
   const [category, setCategory] = useState(""),
     [text, setText] = useState(""),
-    [search, setSearch] = useState(""),
-    [offset, setOffset] = useState(0);
+    [search, setSearch] = useState("");
   const categories = useQuery({
     queryKey: ["offer-categories"],
     queryFn: () => raw<Category[]>("/categories"),
     retry: false,
   });
-  const query = useQuery({
+  const query = useScrollQuery({
+    field: "offers",
     queryKey: [
       "public-offers",
       storeId,
@@ -36,11 +37,10 @@ export default function OfferBrowser({
       radius,
       category,
       search,
-      offset,
     ],
-    queryFn: () => {
+    queryFn: ({ pageParam }) => {
       const params = new URLSearchParams({
-        offset: String(offset),
+        offset: String(pageParam),
         limit: "12",
       });
       if (centre && radius !== null) {
@@ -98,7 +98,6 @@ export default function OfferBrowser({
           aria-pressed={!category}
           onClick={() => {
             setCategory("");
-            setOffset(0);
           }}
         >
           All categories
@@ -109,7 +108,6 @@ export default function OfferBrowser({
             aria-pressed={category === item.id}
             onClick={() => {
               setCategory(item.id);
-              setOffset(0);
             }}
           >
             {item.name}
@@ -121,8 +119,8 @@ export default function OfferBrowser({
         onSubmit={(e) => {
           e.preventDefault();
           setSearch(text.trim());
-          setOffset(0);
-          if (search === text.trim() && offset === 0) void query.refetch();
+
+          if (search === text.trim()) void query.refetch();
         }}
       >
         <Field
@@ -200,23 +198,7 @@ export default function OfferBrowser({
               ))}
             </div>
           )}
-          <div className="action-row">
-            <button
-              className="text-button"
-              disabled={offset === 0 || query.isFetching}
-              onClick={() => setOffset(Math.max(0, offset - 12))}
-            >
-              Previous offer results
-            </button>
-            <span>Page {offset / 12 + 1}</span>
-            <button
-              className="text-button"
-              disabled={query.data.next_offset === null || query.isFetching}
-              onClick={() => setOffset(query.data!.next_offset!)}
-            >
-              Next offer results
-            </button>
-          </div>
+          <ScrollMore query={query} label="offers" />
         </>
       )}
     </section>

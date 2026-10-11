@@ -14,7 +14,8 @@ class Advertisement(Base):
             "status IN ('DRAFT','ENABLED','DISABLED','ARCHIVED')", name="advertisement_status"
         ),
         CheckConstraint(
-            "placement IN ('BELOW_DAILY','BELOW_OFFERS')", name="advertisement_placement"
+            "placement IN ('BELOW_HERO','ABOVE_OFFERS','BELOW_DAILY','BELOW_OFFERS')",
+            name="advertisement_placement",
         ),
         CheckConstraint(
             "destination_type IN ('DISCOVER','STORE','OFFER')", name="advertisement_destination"

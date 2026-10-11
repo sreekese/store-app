@@ -1,9 +1,9 @@
 import { TrackView, sendEvent } from "../analytics/tracking";
 import { useAuth } from "../auth/AuthProvider";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { raw } from "../auth/client";
-import type { Card, Placement } from "./types";
+import { placements, type Card, type Placement } from "./types";
 const uuid = "[0-9a-fA-F-]{36}";
 export function safeDestination(href: string) {
   return (
@@ -62,6 +62,71 @@ export function AdCard({
     </aside>
   );
 }
+function BannerSlider({ ads, track }: { ads: Card[]; track: boolean }) {
+  const [selected, setSelected] = useState(ads[0].id);
+  const start = useRef<{ x: number; y: number } | null>(null);
+  const index = Math.max(
+    0,
+    ads.findIndex((ad) => ad.id === selected),
+  );
+  const move = (direction: number) =>
+    setSelected(ads[(index + direction + ads.length) % ads.length].id);
+  return (
+    <div
+      className="ad-banner"
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="Advertisement banner"
+    >
+      <div
+        onTouchStart={(event) => {
+          const touch = event.touches[0];
+          start.current = { x: touch.clientX, y: touch.clientY };
+        }}
+        onTouchCancel={() => {
+          start.current = null;
+        }}
+        onTouchEnd={(event) => {
+          const touch = event.changedTouches[0];
+          if (start.current) {
+            const dx = touch.clientX - start.current.x;
+            const dy = touch.clientY - start.current.y;
+            if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy))
+              move(dx < 0 ? 1 : -1);
+          }
+          start.current = null;
+        }}
+      >
+        <AdCard key={ads[index].id} ad={ads[index]} track={track} />
+      </div>
+      {ads.length > 1 && (
+        <div className="ad-banner-controls">
+          <div
+            className="ad-banner-dots"
+            role="group"
+            aria-label="Choose advertisement"
+          >
+            {ads.map((ad, i) => (
+              <button
+                type="button"
+                key={ad.id}
+                aria-label={`Show advertisement ${i + 1}`}
+                aria-pressed={i === index}
+                onClick={() => setSelected(ad.id)}
+              >
+                <span aria-hidden="true" />
+              </button>
+            ))}
+          </div>
+          <span className="ad-banner-count" role="status" aria-live="polite">
+            {index + 1} / {ads.length}
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function AdSlot({ placement }: { placement: Placement }) {
   const auth = useAuth();
   const [, tick] = useState(0);
@@ -94,10 +159,46 @@ export default function AdSlot({ placement }: { placement: Placement }) {
     Date.parse(query.data.page.server_time) +
     performance.now() -
     query.data.receivedAt;
-  const ad = query.data.page.items.find(
-    (a) => a.placement === placement && Date.parse(a.valid_until) > now,
+  const ads = query.data.page.items.filter(
+    (a) =>
+      a.placement === placement &&
+      Date.parse(a.valid_until) > now &&
+      safeDestination(a.href),
   );
-  return ad ? (
-    <AdCard key={ad.id} ad={ad} track={auth.user?.role === "USER"} />
-  ) : null;
+  if (!ads.length) return null;
+  return (
+    <section
+      className="ad-placement"
+      aria-label={`Sponsored · ${placements[placement]}`}
+    >
+      {placement !== "BELOW_HERO" ? (
+        <BannerSlider ads={ads} track={auth.user?.role === "USER"} />
+      ) : (
+        <>
+          {ads.length > 1 && (
+            <div className="section-heading">
+              <p className="eyebrow">Sponsored discoveries</p>
+              <p className="muted">
+                {ads.length} ads · Swipe or scroll to explore
+              </p>
+            </div>
+          )}
+          <div
+            className={ads.length > 1 ? "ad-rail" : "ad-single"}
+            tabIndex={ads.length > 1 ? 0 : undefined}
+            role={ads.length > 1 ? "region" : undefined}
+            aria-label={
+              ads.length > 1
+                ? "Sponsored ads; scroll horizontally for more"
+                : undefined
+            }
+          >
+            {ads.map((ad) => (
+              <AdCard key={ad.id} ad={ad} track={auth.user?.role === "USER"} />
+            ))}
+          </div>
+        </>
+      )}
+    </section>
+  );
 }

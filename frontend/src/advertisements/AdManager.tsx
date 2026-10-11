@@ -485,19 +485,19 @@ function Editor({
                 </p>
               )}
               {preview.overlap && (
-                <p role="alert">
-                  Another enabled ad overlaps this placement and schedule.
-                  Change the dates or disable that ad first.
+                <p>
+                  This ad will share this placement with other enabled ads in
+                  this placement during overlapping schedules.
                 </p>
               )}
               <p>
                 Publication rechecks destination eligibility and schedule
-                conflicts. Preview approval expires after ten minutes.
+                validity. Preview approval expires after ten minutes.
               </p>
               {row.status !== "ENABLED" && !archived && (
                 <button
                   className="button"
-                  disabled={busy || preview.overlap}
+                  disabled={busy}
                   onClick={() => action.mutate("ENABLE")}
                 >
                   Enable advertisement
@@ -607,8 +607,10 @@ export default function AdManager() {
       <main className="container workspace-shell ad-manager">
         <h1>Advertisements</h1>
         <p>
-          Manually managed Sponsored placements for shoppers. One enabled ad per
-          placement at a time. No billing or automatic coupon claims.
+          Manually managed Sponsored placements for shoppers. Multiple enabled
+          ads can share each placement. The homepage introduction uses a
+          discovery row; other spots use banner sliders. No billing or automatic
+          coupon claims.
         </p>
         <button
           className="button"

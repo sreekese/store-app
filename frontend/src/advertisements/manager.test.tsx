@@ -110,14 +110,14 @@ it("unsaved changes clear preview and require saving again", async () => {
     await screen.findByText("Advertisement saved as DRAFT."),
   ).toBeInTheDocument();
 });
-it("overlap preview blocks publication", async () => {
+it("overlap preview allows shared placement publication", async () => {
   overlap = true;
   await setup();
   fireEvent.click(screen.getByRole("button", { name: "Preview saved ad" }));
   expect(
     await screen.findByRole("button", { name: "Enable advertisement" }),
-  ).toBeDisabled();
-  expect(screen.getByRole("alert")).toHaveTextContent("overlaps");
+  ).toBeEnabled();
+  expect(screen.getByText(/share this placement/)).toBeInTheDocument();
 });
 it("reload retrieves the current saved revision", async () => {
   await setup();

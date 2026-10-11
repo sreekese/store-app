@@ -4,7 +4,7 @@ from uuid import UUID
 
 import jwt
 from fastapi import APIRouter, Depends, Query, Request
-from sqlalchemy import or_, select, text
+from sqlalchemy import or_, select
 
 from app.advertisements.models import Advertisement
 from app.advertisements.schemas import Action, AdInput, AdUpdate, Revision, Status
@@ -210,16 +210,6 @@ def action(id: UUID, data: Action, db: DB, user: Super, request: Request) -> dic
         except jwt.InvalidTokenError:
             fail("Preview this saved revision again before enabling it.")
         validate_target(db, AdInput.model_validate(output(row), extra="ignore"))
-        # Serialize publication per placement, including separate ads/admin sessions.
-        db.execute(
-            text("SELECT pg_advisory_xact_lock(130013, :slot)"),
-            {"slot": 1 if row.placement == "BELOW_DAILY" else 2},
-        )
-        if conflicts(db, row):
-            fail(
-                "Another enabled advertisement overlaps this placement and schedule. "
-                "Disable it or change the dates."
-            )
         row.status = "ENABLED"
     elif data.action == "DISABLE":
         if row.status != "ENABLED":

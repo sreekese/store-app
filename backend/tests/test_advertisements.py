@@ -152,12 +152,12 @@ def test_concurrent_overlaps_and_independent_placements(client):
                 zip(ads, tokens, strict=True),
             )
         )
-    assert sorted(r.status_code for r in results) == [200, 409]
+    assert sorted(r.status_code for r in results) == [200, 200]
     daily = client.post(
         BASE + "/manage", headers=headers, json={**fields(), "placement": "BELOW_DAILY"}
     ).json()
     assert act(client, headers, daily, token=preview(client, headers, daily)).status_code == 200
-    assert len(client.get(BASE).json()["items"]) == 2
+    assert len(client.get(BASE).json()["items"]) == 3
 
 
 def test_scheduling_expiry_and_disable(client):
@@ -233,3 +233,15 @@ def test_store_destination_and_offer_branch_filter(client):
     assert response.status_code == 200
     assert offer["id"] in response.text
     assert offer["id"] not in client.get("/api/v1/offers", params={"store_id": str(uuid4())}).text
+
+
+@pytest.mark.parametrize("placement", ["BELOW_HERO", "ABOVE_OFFERS"])
+def test_new_placements_publish_multiple_ads(client, placement):
+    headers = admin(client)
+    ids = set()
+    for _ in range(2):
+        ad = create(client, headers, placement=placement)
+        ids.add(ad["id"])
+        assert act(client, headers, ad, token=preview(client, headers, ad)).status_code == 200
+    rows = client.get(BASE).json()["items"]
+    assert {row["id"] for row in rows if row["placement"] == placement} == ids
