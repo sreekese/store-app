@@ -178,9 +178,6 @@ export default function AdSlot({ placement }: { placement: Placement }) {
           {ads.length > 1 && (
             <div className="section-heading">
               <p className="eyebrow">Sponsored discoveries</p>
-              <p className="muted">
-                {ads.length} ads · Swipe or scroll to explore
-              </p>
             </div>
           )}
           <div
