@@ -23,7 +23,8 @@ export function AdCard({
 }) {
   const [failed, setFailed] = useState("");
   if (!safeDestination(ad.href)) return null;
-  const showImage = !!ad.image_url && failed !== ad.image_url;
+  const imageUrl = ad.image_url || "/images/local-finds.webp";
+  const showImage = failed !== imageUrl;
   return (
     <aside
       className={`sponsored-card${showImage ? " with-creative" : ""}`}
@@ -50,13 +51,13 @@ export function AdCard({
       </div>
       {showImage && (
         <img
-          src={ad.image_url}
-          alt={ad.image_alt}
+          src={imageUrl}
+          alt={ad.image_url ? ad.image_alt : ""}
           width="640"
           height="360"
           loading="lazy"
           referrerPolicy="no-referrer"
-          onError={() => setFailed(ad.image_url)}
+          onError={() => setFailed(imageUrl)}
         />
       )}
     </aside>

@@ -1,19 +1,20 @@
 /* Customer-only visual system. Management routes keep their existing styles. */
 .shopper-design {
-  --ink: #173f38;
-  --teal: #174f46;
-  --lime: #e6f28a;
-  --paper: #fbfaf5;
-  --line: #dce5dd;
+  --ink: #382731;
+  --teal: #873c48;
+  --lime: #f1c89f;
+  --paper: #fffaf5;
+  --line: #e8d9d0;
   min-height: 100vh;
   color: var(--ink);
   background: var(--paper);
-  font-family: "Avenir Next", "Segoe UI", Arial, sans-serif;
+  font-family: "Trebuchet MS", "Segoe UI", Arial, sans-serif;
 }
 .shopper-design h1,
 .shopper-design h2,
 .shopper-design h3 {
-  font-family: inherit;
+  font-family:
+    "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
   color: var(--ink);
 }
 .shopper-design h1 {
@@ -31,7 +32,7 @@
   letter-spacing: -0.02em;
 }
 .shopper-design p {
-  color: #52675f;
+  color: var(--theme-muted, #79656d);
   line-height: 1.75;
 }
 .shopper-design .container {
@@ -41,7 +42,7 @@
 .shopper-design .header {
   min-height: 86px;
   padding: 18px max(24px, calc((100vw - 1180px) / 2));
-  background: #fffef9;
+  background: var(--theme-surface, #fffef9);
   border-color: var(--line);
   gap: 20px;
 }
@@ -93,17 +94,17 @@
     box-shadow 0.18s;
 }
 .shopper-design .button:hover:not(:disabled) {
-  background: #103c34;
+  background: #652936;
   color: #fff;
   box-shadow: 0 5px 15px #174f461b;
 }
 .shopper-design .button.secondary {
-  background: white;
+  background: var(--theme-surface, white);
   color: var(--teal);
-  border-color: #a4baae;
+  border-color: var(--theme-line, #a4baae);
 }
 .shopper-design .button.secondary:hover:not(:disabled) {
-  background: #edf3ed;
+  background: var(--theme-soft, #edf3ed);
   color: var(--teal);
   border-color: var(--teal);
 }
@@ -122,7 +123,7 @@
   font-size: 11px;
   letter-spacing: 0.14em;
   line-height: 1.8;
-  color: #426456;
+  color: var(--theme-muted, #79656d);
 }
 .shopper-design .market-hero {
   display: grid;
@@ -130,7 +131,7 @@
   gap: 32px;
   align-items: center;
   border-radius: 28px;
-  background: #edf1e4;
+  background: var(--theme-soft, #f5e7db);
   padding: 54px 48px;
   position: relative;
   overflow: hidden;
@@ -175,7 +176,7 @@
   padding: 12px 0;
   font-size: 13px;
   font-weight: 650;
-  border-bottom: 1px solid #93a69a;
+  border-bottom: 1px solid var(--theme-line, #93a69a);
 }
 .shopper-design .market-hero-note {
   font-size: 12px;
@@ -198,9 +199,9 @@
   transform: rotate(-4deg);
   margin: 0 auto -6px;
   width: fit-content;
-  background: white;
+  background: var(--theme-surface, white);
   padding: 10px 18px;
-  border: 1px solid #cddacf;
+  border: 1px solid var(--theme-line, #cddacf);
   border-radius: 24px;
   box-shadow: 0 8px 22px #254d3910;
   font-size: 12px;
@@ -208,7 +209,7 @@
 }
 .shopper-design .art-orbit {
   position: absolute;
-  border: 1px dashed #b2c2a2;
+  border: 1px dashed var(--theme-line, #b2c2a2);
   border-radius: 50%;
   width: 90%;
   aspect-ratio: 1;
@@ -227,8 +228,8 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  background: #fffdf6;
-  border: 1px solid #d5e0cf;
+  background: var(--theme-surface, #fffdf6);
+  border: 1px solid var(--theme-line, #d5e0cf);
   border-radius: 16px;
   padding: 15px 20px;
   width: fit-content;
@@ -267,14 +268,14 @@
 .shopper-design .market-intro-strip > span {
   font-size: 12px;
   font-weight: 600;
-  color: #53665a;
+  color: var(--theme-muted, #53665a);
   display: flex;
   align-items: center;
   gap: 10px;
 }
 .shopper-design .market-intro-strip > span::before {
   content: "✳";
-  color: #7a6546;
+  color: var(--theme-muted, #7a6546);
 }
 .shopper-design .discovery {
   padding: 40px 0 12px;
@@ -288,7 +289,7 @@
   margin-top: 8px;
 }
 .shopper-design .location-picker {
-  background: white;
+  background: var(--theme-surface, white);
   border: 1px solid var(--line);
   border-radius: 20px;
   padding: 28px;
@@ -299,9 +300,9 @@
 .shopper-design .auth-form select,
 .shopper-design .auth-form textarea,
 .shopper-design .filter-label select {
-  border: 1px solid #b9c9bc;
+  border: 1px solid var(--theme-line, #b9c9bc);
   border-radius: 10px;
-  background: #fffefb;
+  background: var(--theme-surface, #fffefb);
   color: var(--ink);
   padding: 13px 14px;
   min-height: 48px;
@@ -321,7 +322,7 @@
   padding: 18px;
 }
 .shopper-design .place-option.selected {
-  background: #f3f8d9;
+  background: var(--theme-soft, #f3f8d9);
   outline-color: var(--teal);
 }
 .shopper-design .coordinate-picker {
@@ -343,8 +344,8 @@
 }
 .shopper-design .category-pills button {
   min-height: 44px;
-  border: 1px solid #ccd7ce;
-  background: white;
+  border: 1px solid var(--theme-line, #ccd7ce);
+  background: var(--theme-surface, white);
   border-radius: 24px;
   padding: 10px 18px;
   color: var(--ink);
@@ -359,7 +360,7 @@
   gap: 22px;
 }
 .shopper-design .discovery-card {
-  background: white;
+  background: var(--theme-surface, white);
   border: 1px solid var(--line);
   border-radius: 20px;
   padding: 24px;
@@ -381,7 +382,11 @@
   gap: 8px;
 }
 .shopper-design .store-initial {
-  background: linear-gradient(140deg, #e4ecd3, #f5eddd);
+  background: linear-gradient(
+    140deg,
+    var(--theme-soft, #e4ecd3),
+    var(--theme-soft, #f5eddd)
+  );
   color: var(--teal);
   border-radius: 15px;
   width: 64px;
@@ -401,38 +406,38 @@
 }
 .shopper-design .badge {
   border-radius: 7px;
-  background: #eaf2d5;
-  color: #264d35;
+  background: var(--theme-soft, #eaf2d5);
+  color: var(--theme-text, #264d35);
   padding: 7px 10px;
   font-size: 11px;
   line-height: 1.5;
 }
 .shopper-design .distance {
-  color: #4d6358;
-  background: #f3f5ef;
+  color: var(--theme-muted, #4d6358);
+  background: var(--theme-soft, #f3f5ef);
   padding: 6px 9px;
   border-radius: 6px;
   font-size: 11px;
 }
 .shopper-design .notice,
 .shopper-design .empty-state {
-  background: #f1f4ea;
-  border: 1px solid #d9e1d0;
+  background: var(--theme-soft, #f1f4ea);
+  border: 1px solid var(--theme-line, #d9e1d0);
   border-radius: 16px;
   padding: 24px;
-  color: #4d6358;
+  color: var(--theme-muted, #4d6358);
 }
 .shopper-design .notice h3 {
   margin-bottom: 8px;
 }
 .shopper-design .form-error {
-  color: #963b2f;
-  background: #fff0eb;
+  color: var(--theme-danger-text, #963b2f);
+  background: var(--theme-danger-surface, #fff0eb);
   border-radius: 10px;
   padding: 14px;
 }
 .shopper-design .account-panel {
-  background: white;
+  background: var(--theme-surface, white);
   border: 1px solid var(--line);
   border-radius: 20px;
   padding: 30px;
@@ -447,13 +452,17 @@
   margin: 10px 0 18px;
 }
 .shopper-design .wallet-grid .discovery-card {
-  border-top: 5px solid #ccdc90;
-  background: linear-gradient(180deg, #f8faed, white 60%);
+  border-top: 5px solid var(--theme-line, #ccdc90);
+  background: linear-gradient(
+    180deg,
+    var(--theme-soft, #f8faed),
+    var(--theme-surface, white) 60%
+  );
 }
 .shopper-design .coupon-code {
-  background: #f4f6ed;
+  background: var(--theme-soft, #f4f6ed);
   border-radius: 18px;
-  border: 1px dashed #829b86;
+  border: 1px dashed var(--theme-line, #829b86);
 }
 .shopper-design .coupon-code svg {
   max-width: 100%;
@@ -470,7 +479,7 @@
   line-height: 1.8;
 }
 .shopper-design .readiness {
-  background: #f0f3e8;
+  background: var(--theme-soft, #f0f3e8);
   border: 1px solid var(--line);
   border-radius: 22px;
   padding: 32px;
@@ -482,7 +491,7 @@
   margin: 10px 0;
 }
 .shopper-design .status-card {
-  background: white;
+  background: var(--theme-surface, white);
   border: 1px solid var(--line);
   box-shadow: none;
   border-radius: 16px;
@@ -495,7 +504,7 @@
   padding: 26px;
   border: 1px solid var(--line);
   border-radius: 18px;
-  background: white;
+  background: var(--theme-surface, white);
 }
 .shopper-design .steps article > span {
   color: var(--teal);
@@ -530,29 +539,29 @@
   border-color: var(--lime);
 }
 .shopper-design .cta .button:hover:not(:disabled) {
-  background: #d4e578;
+  background: var(--theme-soft, #d4e578);
   color: var(--ink);
-  border-color: #d4e578;
+  border-color: var(--theme-line, #d4e578);
 }
 .shopper-design footer {
-  background: #f0f1e7;
+  background: var(--theme-soft, #f0f1e7);
   border-top: 1px solid var(--line);
   padding: 40px max(24px, calc((100vw - 1180px) / 2));
 }
 .shopper-design .footnote {
   font-size: 12px;
-  color: #56695b;
+  color: var(--theme-muted, #56695b);
 }
 .shopper-design .footer-grid a {
   font-size: 13px;
   padding: 10px 0;
 }
 .shopper-design .login {
-  background: #fbfaf5;
+  background: var(--theme-soft, #fbfaf5);
   min-height: 100vh;
 }
 .shopper-design .login > section:first-child {
-  background: #eaf0db;
+  background: var(--theme-soft, #eaf0db);
   color: var(--ink);
 }
 .shopper-design .login h1 {
@@ -560,7 +569,7 @@
   line-height: 1.1;
 }
 .shopper-design .login > section:last-child {
-  background: #fffef9;
+  background: var(--theme-surface, #fffef9);
 }
 .shopper-design .login .auth-form {
   gap: 20px;
@@ -697,7 +706,7 @@
   min-height: 64px;
   padding: 16px 0;
   text-align: center;
-  color: #50685f;
+  color: var(--theme-muted, #50685f);
 }
 .shopper-design .scroll-more p {
   margin: 8px 0;
@@ -715,7 +724,7 @@
   overflow-x: auto;
   scroll-snap-type: x proximity;
   padding: 4px 0 16px;
-  scrollbar-color: #7f9e8d #edf3ed;
+  scrollbar-color: var(--theme-muted, #7f9e8d) #edf3ed;
 }
 .shopper-design .ad-rail:focus-visible {
   outline: 3px solid #a25323;
@@ -746,9 +755,9 @@
 
 .shopper-design .ad-banner {
   overflow: hidden;
-  border: 1px solid #c6d5c4;
+  border: 1px solid var(--theme-line, #c6d5c4);
   border-radius: 22px;
-  background: #edf3e7;
+  background: var(--theme-soft, #edf3e7);
 }
 .shopper-design .ad-banner .sponsored-card {
   margin: 0;

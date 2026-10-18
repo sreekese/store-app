@@ -1,0 +1,91 @@
+:root[data-theme="dark"] {
+  --theme-text: #e1f0e8;
+  --theme-muted: #b8cbc1;
+  --theme-surface: #182a23;
+  --theme-soft: #24392e;
+  --theme-line: #506b5c;
+  --theme-accent: #a9dcae;
+  --theme-danger-text: #ffb4a6;
+  --theme-danger-surface: #45261f;
+  background: #101d19;
+  color: var(--theme-text);
+  color-scheme: dark;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+:root[data-theme="dark"] .shopper-design {
+  --ink: #e1f0e8;
+  --paper: #101d19;
+  --line: #506b5c;
+}
+:root[data-theme="dark"]
+  .shopper-design
+  :is(.brand, .text-button, .market-wallet-link, .market-kicker, .eyebrow) {
+  color: #bce7c3;
+}
+:root[data-theme="dark"] .shopper-design .button.secondary {
+  background: #223d31;
+  color: #e1f0e8;
+  border-color: #739783;
+}
+:root[data-theme="dark"]
+  .shopper-design
+  .button.secondary:hover:not(:disabled) {
+  background: #345443;
+  color: #fff;
+}
+:root[data-theme="dark"]
+  .shopper-design
+  :is(.store-initial, .steps article > span) {
+  color: #bce7c3;
+  background: #2b4433;
+}
+:root[data-theme="dark"] .shopper-design .cta .button {
+  color: #173f38;
+}
+:root[data-theme="dark"]
+  .shopper-design
+  .category-pills
+  button[aria-pressed="true"] {
+  background: #174f46;
+  color: white;
+}
+.theme-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px max(20px, calc((100vw - 1180px) / 2));
+  background: var(--theme-surface, #fffef9);
+  border-bottom: 1px solid var(--theme-line, #dce5dd);
+}
+.theme-switch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--theme-line, #b6c8bd);
+  border-radius: 24px;
+  background: var(--theme-soft, #edf3ed);
+  color: var(--theme-text, #174f46);
+  font:
+    600 14px Arial,
+    sans-serif;
+}
+.theme-switch:hover {
+  box-shadow: 0 0 0 2px var(--theme-line, #b6c8bd);
+}
+:root[data-theme="dark"] input::placeholder,
+:root[data-theme="dark"] textarea::placeholder {
+  color: #a8bcb0;
+  opacity: 1;
+}
+:root[data-theme="dark"] .shopper-design .art-caption > span {
+  color: #173f38;
+}
+:root[data-theme="dark"] .shopper-design .cta .button:hover:not(:disabled) {
+  background: #d4e578;
+  color: #173f38;
+}

@@ -1,0 +1,188 @@
+/* Editorial storefront accents; management screens retain their own palette. */
+.shopper-design h1 {
+  font-weight: 500;
+  letter-spacing: -0.055em;
+}
+.shopper-design h2 {
+  font-weight: 500;
+}
+.shopper-design .market-hero {
+  grid-template-columns: 1fr 1.1fr;
+  padding: 48px;
+  background: var(--theme-soft, #f5e7db);
+}
+.shopper-design .market-hero h1 {
+  font-size: clamp(46px, 5.5vw, 76px);
+  line-height: 1.02;
+}
+.shopper-design .storefront-photos {
+  position: relative;
+  min-width: 0;
+  padding: 0 0 85px 24px;
+}
+.shopper-design .storefront-photo-main {
+  width: 100%;
+  height: 390px;
+  object-fit: cover;
+  border-radius: 110px 110px 18px 18px;
+  display: block;
+}
+.shopper-design .storefront-photo-detail {
+  position: absolute;
+  width: 52%;
+  height: 155px;
+  left: 0;
+  bottom: 10px;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 6px solid var(--theme-surface, #fffaf5);
+  box-shadow: 0 16px 32px #38273120;
+  transform: rotate(-6deg);
+}
+.shopper-design .photo-caption {
+  position: absolute;
+  top: 24px;
+  left: 0;
+  padding: 12px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--theme-text, #382731);
+  background: var(--theme-surface, #fffaf5);
+  border-radius: 24px;
+  box-shadow: 0 8px 22px #38273115;
+}
+.shopper-design .photo-stamp {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  color: var(--theme-text, #873c48);
+  font:
+    italic 24px/1.1 Georgia,
+    serif;
+  transform: rotate(6deg);
+}
+.shopper-design .local-inspiration {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--theme-soft, #f3e3d6);
+  border-radius: 24px;
+  overflow: hidden;
+  margin: 40px 0;
+}
+.shopper-design .local-inspiration > img {
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+  object-fit: cover;
+}
+.shopper-design .local-inspiration > div {
+  padding: 42px;
+  align-self: center;
+}
+.shopper-design .local-inspiration h2 {
+  margin: 16px 0;
+  font-size: clamp(30px, 4vw, 46px);
+}
+.shopper-design .ad-banner {
+  background: var(--theme-soft, #f3e3d6);
+  border-color: var(--line);
+}
+.shopper-design .sponsored-card {
+  background: var(--theme-soft, #f6ece3);
+  border-color: var(--line);
+}
+.shopper-design .store-initial {
+  background: var(--theme-soft, #f4e1d3);
+  color: var(--theme-text, #873c48);
+}
+.shopper-design .badge {
+  background: var(--theme-soft, #f7e4d5);
+  color: var(--theme-text, #743b34);
+}
+.shopper-design .ad-banner-dots button[aria-pressed="true"] span {
+  background: var(--theme-accent, #873c48);
+}
+.shopper-design .button.secondary:hover:not(:disabled) {
+  background: var(--theme-soft, #f5e7db);
+}
+:root[data-theme="dark"] .shopper-design {
+  --ink: #f4e5dc;
+  --paper: #211a20;
+  --line: #68515d;
+  --theme-text: #f4e5dc;
+  --theme-muted: #d1b9c5;
+  --theme-surface: #2b2229;
+  --theme-soft: #3b2b33;
+  --theme-line: #68515d;
+  --theme-accent: #efb4a3;
+}
+:root[data-theme="dark"]
+  .shopper-design
+  :is(.brand, .text-button, .market-wallet-link, .market-kicker, .eyebrow) {
+  color: #efb4a3;
+}
+:root[data-theme="dark"] .shopper-design .button.secondary {
+  background: #3b2b33;
+  color: #f4e5dc;
+  border-color: #987886;
+}
+:root[data-theme="dark"]
+  .shopper-design
+  .button.secondary:hover:not(:disabled) {
+  background: #513a46;
+  color: white;
+}
+:root[data-theme="dark"]
+  .shopper-design
+  :is(.store-initial, .steps article > span) {
+  background: #513a46;
+  color: #efb4a3;
+}
+:root[data-theme="dark"]
+  .shopper-design
+  .category-pills
+  button[aria-pressed="true"] {
+  background: #873c48;
+}
+:root[data-theme="dark"] .shopper-design .cta .button {
+  color: #382731;
+}
+:root[data-theme="dark"] .shopper-design .cta .button:hover:not(:disabled) {
+  background: #edb687;
+  color: #382731;
+}
+@media (max-width: 1000px) {
+  .shopper-design .market-hero {
+    grid-template-columns: 1fr;
+  }
+  .shopper-design .storefront-photos {
+    max-width: 560px;
+    width: 100%;
+    margin: auto;
+  }
+}
+@media (max-width: 700px) {
+  .shopper-design .market-hero {
+    padding: 28px 22px;
+  }
+  .shopper-design .storefront-photo-main {
+    height: 290px;
+  }
+  .shopper-design .storefront-photo-detail {
+    height: 120px;
+  }
+  .shopper-design .photo-caption {
+    font-size: 10px;
+    padding: 10px 12px;
+  }
+  .shopper-design .local-inspiration {
+    grid-template-columns: 1fr;
+  }
+  .shopper-design .local-inspiration > img {
+    height: 220px;
+    min-height: 0;
+  }
+  .shopper-design .local-inspiration > div {
+    padding: 28px;
+  }
+}

@@ -1,3 +1,4 @@
+import ThemeSwitch from "./theme/ThemeSwitch";
 import { lazy, Suspense } from "react";
 import { Link, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
@@ -24,6 +25,11 @@ export default function App() {
   );
   return (
     <div className={shopper ? "shopper-design" : undefined}>
+      {pathname !== "/" && (
+        <div className="theme-toolbar">
+          <ThemeSwitch />
+        </div>
+      )}
       <Suspense
         fallback={
           <main className="loading" role="status">

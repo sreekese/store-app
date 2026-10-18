@@ -1,7 +1,8 @@
+import ThemeSwitch from "../theme/ThemeSwitch";
 import { lazy, Suspense } from "react";
 import { useAuth } from "../auth/AuthProvider";
 import { Link } from "react-router-dom";
-import NeighbourhoodArt from "../shopper/NeighbourhoodArt";
+import StorefrontPhotos from "../shopper/StorefrontPhotos";
 const AdSlot = lazy(() => import("../advertisements/AdSlot"));
 const Discover = lazy(() => import("../locations/Discover"));
 export default function Home() {
@@ -18,6 +19,7 @@ export default function Home() {
           {auth.user?.role === "USER" && (
             <Link to="/app/notifications">Notifications</Link>
           )}
+          <ThemeSwitch />
           <Link to={auth.user?.role === "USER" ? "/app" : "/login"}>
             {auth.user?.role === "USER" ? "My account" : "Sign in"}
           </Link>
@@ -46,7 +48,7 @@ export default function Home() {
               Find a place. Discover an offer. Make it yours.
             </p>
           </div>
-          <NeighbourhoodArt />
+          <StorefrontPhotos />
         </section>
         <div
           className="market-intro-strip"
@@ -72,6 +74,33 @@ export default function Home() {
           <AdSlot placement="BELOW_HERO" />
           <Discover />
         </Suspense>
+        <section
+          className="local-inspiration"
+          aria-label="Discover more local offers"
+        >
+          <img
+            src="/images/local-finds.webp"
+            alt=""
+            width="1536"
+            height="1024"
+            loading="lazy"
+          />
+          <div>
+            <p className="eyebrow">MAKE A LITTLE ROOM FOR LOCAL</p>
+            <h2>
+              Everyday finds.
+              <br />
+              Unexpected favourites.
+            </h2>
+            <p>
+              From your first coffee to your next favourite outfit, explore
+              what’s waiting nearby.
+            </p>
+            <a className="button" href="#discover">
+              Discover local offers
+            </a>
+          </div>
+        </section>
         <section className="steps">
           <article>
             <span>01</span>
