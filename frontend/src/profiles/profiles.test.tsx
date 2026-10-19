@@ -81,12 +81,15 @@ it("loads shopper profile and saves only editable fields", async () => {
     .mockResolvedValueOnce(profile)
     .mockResolvedValueOnce({ ...profile, display_name: "New name" });
   setup(<ShopperProfile />);
-  fireEvent.change(await screen.findByLabelText("Display name"), {
+  expect(await screen.findByLabelText("Display name")).toBeDisabled();
+  fireEvent.click(screen.getByRole("button", { name: "Edit profile" }));
+  fireEvent.change(screen.getByLabelText("Display name"), {
     target: { value: "New name" },
   });
   expect(screen.getByLabelText("Account email")).toHaveAttribute("readonly");
   fireEvent.click(screen.getByRole("button", { name: "Save profile" }));
   expect(await screen.findByText("Profile saved.")).toBeInTheDocument();
+  expect(screen.getByLabelText("Display name")).toBeDisabled();
   const options = api.mock.calls[1][1]!;
   expect(options.method).toBe("PUT");
   expect(JSON.parse(options.body as string)).toEqual({
@@ -100,7 +103,8 @@ it("shows profile save errors without losing entered text", async () => {
     .mockResolvedValueOnce(profile)
     .mockRejectedValueOnce(new Error("Could not save profile"));
   setup(<ShopperProfile />);
-  fireEvent.change(await screen.findByLabelText("City"), {
+  fireEvent.click(await screen.findByRole("button", { name: "Edit profile" }));
+  fireEvent.change(screen.getByLabelText("City"), {
     target: { value: "Thrissur" },
   });
   fireEvent.click(screen.getByRole("button", { name: "Save profile" }));
@@ -350,4 +354,19 @@ it("admin empty queue and filters remain usable", async () => {
       name: "SUSPENDED",
     }),
   ).toBeInTheDocument();
+});
+
+it("cancels profile edits without saving changes", async () => {
+  api.mockResolvedValue(profile);
+  setup(<ShopperProfile />);
+  fireEvent.click(await screen.findByRole("button", { name: "Edit profile" }));
+  fireEvent.change(screen.getByLabelText("Display name"), {
+    target: { value: "Unsaved name" },
+  });
+  fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+  expect(screen.getByLabelText("Display name")).toHaveValue(
+    profile.display_name,
+  );
+  expect(screen.getByLabelText("Display name")).toBeDisabled();
+  expect(api).toHaveBeenCalledTimes(1);
 });

@@ -190,7 +190,7 @@ describe("Sprint 1 account flows", () => {
       ),
     ).toBe(true);
   });
-  it("submits credentials and enters the shopper workspace", async () => {
+  it("submits credentials and enters the shopper storefront", async () => {
     const fetch = mockFetch();
     setup("/login");
     await screen.findByLabelText("Email address");
@@ -205,7 +205,7 @@ describe("Sprint 1 account flows", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: "Sign in →" }));
     expect(
-      await screen.findByText("Your account is ready."),
+      await screen.findByText("Good things are closer."),
     ).toBeInTheDocument();
     const payload = fetch.mock.calls.find(([url]) =>
       url.endsWith("/auth/login"),
@@ -251,28 +251,72 @@ describe("Sprint 1 account flows", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: "Create account →" }));
     expect(
-      await screen.findByText("Your account is ready."),
+      await screen.findByText("Good things are closer."),
     ).toBeInTheDocument();
     expect(
       fetch.mock.calls.some(([url]) => url.endsWith("/auth/register")),
     ).toBe(true);
   });
+  it.each(["/", "/app"])(
+    "keeps the storefront and saved profile accessible at %s",
+    async (path) => {
+      mockFetch("USER");
+      setup(path);
+      expect(
+        await screen.findByText("Good things are closer."),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByText("Your account is ready."),
+      ).not.toBeInTheDocument();
+      fireEvent.click(screen.getByRole("button", { name: "My account" }));
+      expect(screen.queryByLabelText("Display name")).not.toBeInTheDocument();
+      expect(
+        screen.getByRole("link", { name: "Saved coupons and history" }),
+      ).toHaveAttribute("href", "/app/coupons");
+      fireEvent.click(screen.getByRole("link", { name: "My profile" }));
+      expect(await screen.findByLabelText("Display name")).toHaveValue(
+        "Ananya",
+      );
+      expect(screen.getByLabelText("Display name")).toBeDisabled();
+      expect(
+        screen.queryByText("Good things are closer."),
+      ).not.toBeInTheDocument();
+    },
+  );
+  it.each(["/app/profile", "/app/coupons", "/app/coupons/coupon-123"])(
+    "requires login for %s",
+    async (path) => {
+      const fetch = mockFetch();
+      setup(path);
+      expect(
+        await screen.findByRole("heading", { name: "Shopper sign in" }),
+      ).toBeInTheDocument();
+      expect(
+        fetch.mock.calls.some(
+          ([url]) =>
+            url.endsWith("/profile") || url.includes("/shopper/claims"),
+        ),
+      ).toBe(false);
+      expect(safeReturnTo("USER", path)).toBe(path);
+    },
+  );
   it("logs out and removes protected content", async () => {
     mockFetch("USER");
     setup("/app");
-    await screen.findByText("Your account is ready.");
-    fireEvent.click(screen.getByRole("button", { name: "Sign out" }));
+    await screen.findByText("Good things are closer.");
+    fireEvent.click(screen.getByRole("button", { name: "My account" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Sign out" }));
     expect(
       await screen.findByRole("heading", { name: "Shopper sign in" }),
     ).toBeInTheDocument();
     expect(
-      screen.queryByText("Your account is ready."),
+      screen.queryByText("Good things are closer."),
     ).not.toBeInTheDocument();
   });
   it("clears private content when another tab signs out", async () => {
     mockFetch("USER");
     setup("/app");
-    await screen.findByText("Your account is ready.");
+    await screen.findByText("Good things are closer.");
     await act(async () => {
       window.dispatchEvent(
         new StorageEvent("storage", {
@@ -285,21 +329,28 @@ describe("Sprint 1 account flows", () => {
       await screen.findByRole("heading", { name: "Shopper sign in" }),
     ).toBeInTheDocument();
     expect(
-      screen.queryByText("Your account is ready."),
+      screen.queryByText("Good things are closer."),
     ).not.toBeInTheDocument();
   });
   it("keeps the session visible when server logout fails", async () => {
     const fetch = mockFetch("USER");
     setup("/app");
-    await screen.findByText("Your account is ready.");
-    fetch.mockImplementationOnce(async () =>
-      response({ error: { message: "Sign out temporarily unavailable" } }, 503),
+    await screen.findByText("Good things are closer.");
+    const original = fetch.getMockImplementation()!;
+    fetch.mockImplementation(async (url, options) =>
+      url.endsWith("/auth/logout")
+        ? response(
+            { error: { message: "Sign out temporarily unavailable" } },
+            503,
+          )
+        : original(url, options),
     );
-    fireEvent.click(screen.getByRole("button", { name: "Sign out" }));
+    fireEvent.click(screen.getByRole("button", { name: "My account" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Sign out" }));
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "Sign out temporarily unavailable",
     );
-    expect(screen.getByText("Your account is ready.")).toBeInTheDocument();
+    expect(screen.getByText("Good things are closer.")).toBeInTheDocument();
   });
   it("shows a recovery state instead of granting access when session check fails", async () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("offline")));

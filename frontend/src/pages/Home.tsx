@@ -1,30 +1,11 @@
-import ThemeSwitch from "../theme/ThemeSwitch";
 import { lazy, Suspense } from "react";
-import { useAuth } from "../auth/AuthProvider";
 import { Link } from "react-router-dom";
 import StorefrontPhotos from "../shopper/StorefrontPhotos";
 const AdSlot = lazy(() => import("../advertisements/AdSlot"));
 const Discover = lazy(() => import("../locations/Discover"));
 export default function Home() {
-  const auth = useAuth();
   return (
     <>
-      <header className="header">
-        <Link to="/" className="brand">
-          <span>✳</span>nearperk.
-        </Link>
-        <nav aria-label="Main navigation">
-          <a href="#discover">Explore</a>
-          <Link to="/app/coupons">My coupons</Link>
-          {auth.user?.role === "USER" && (
-            <Link to="/app/notifications">Notifications</Link>
-          )}
-          <ThemeSwitch />
-          <Link to={auth.user?.role === "USER" ? "/app" : "/login"}>
-            {auth.user?.role === "USER" ? "My account" : "Sign in"}
-          </Link>
-        </nav>
-      </header>
       <main className="container">
         <section className="market-hero" aria-labelledby="market-title">
           <div className="market-hero-copy">

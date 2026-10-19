@@ -53,16 +53,6 @@ const states = ["ACTIVE", "REDEEMED", "EXPIRED", "CANCELLED"] as const;
 function Shell({ children }: { children: ReactNode }) {
   return (
     <>
-      <header className="header">
-        <Link className="brand" to="/app">
-          ✳ nearperk.
-        </Link>
-        <nav aria-label="Shopper navigation">
-          <Link to="/app">Discover</Link>
-          <Link to="/app/coupons">My coupons</Link>
-          <Link to="/app/support">Support</Link>
-        </nav>
-      </header>
       <main className="container wallet-shell">{children}</main>
     </>
   );

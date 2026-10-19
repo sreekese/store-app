@@ -1,9 +1,11 @@
+import ShopperHeader from "./shopper/ShopperHeader";
 import ThemeSwitch from "./theme/ThemeSwitch";
 import { lazy, Suspense } from "react";
 import { Link, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
 import ShopperExperience from "./auth/ShopperExperience";
 import RequireAuth from "./auth/RequireAuth";
+const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const Reports = lazy(() => import("./analytics/Reports"));
 const Billing = lazy(() => import("./billing/Billing"));
 const StoreDetail = lazy(() => import("./locations/StoreDetail"));
@@ -23,9 +25,18 @@ export default function App() {
   const shopper = /^(\/$|\/(login|register)$|\/(app|stores|offers)(\/|$))/.test(
     pathname,
   );
+  const accountPage =
+    /^\/app\/(profile|coupons|notifications|support)(\/|$)/.test(pathname);
   return (
-    <div className={shopper ? "shopper-design" : undefined}>
-      {pathname !== "/" && (
+    <div
+      className={
+        shopper
+          ? `shopper-design${accountPage ? " shopper-account-page" : ""}`
+          : undefined
+      }
+    >
+      {shopper && <ShopperHeader key={pathname} />}
+      {!shopper && (
         <div className="theme-toolbar">
           <ThemeSwitch />
         </div>
@@ -73,7 +84,8 @@ export default function App() {
             <Route path="/app/support" element={<Support role="USER" />} />
             <Route path="/app/support/:id" element={<Support role="USER" />} />
             <Route path="/app/notifications" element={<Inbox role="USER" />} />
-            <Route path="/app" element={<Workspace role="USER" />} />
+            <Route path="/app" element={<Home />} />
+            <Route path="/app/profile" element={<ProfilePage />} />
             <Route path="/app/coupons" element={<Wallet />} />
             <Route path="/app/coupons/:id" element={<CouponDetail />} />
           </Route>

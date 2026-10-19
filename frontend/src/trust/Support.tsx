@@ -164,12 +164,14 @@ export default function Support({ role }: { role: Role }) {
     store = search.get("store");
   return (
     <>
-      <header className="header">
-        <Link className="brand" to={homePaths[role]}>
-          ✳ nearperk.
-        </Link>
-        <Link to={homePaths[role]}>Back to dashboard</Link>
-      </header>
+      {role !== "USER" && (
+        <header className="header">
+          <Link className="brand" to={homePaths[role]}>
+            ✳ nearperk.
+          </Link>
+          <Link to={homePaths[role]}>Back to dashboard</Link>
+        </header>
+      )}
       <main className="container workspace-shell trust-shell">
         <h1>
           {role === "USER" ? "My support cases" : "Support and moderation"}

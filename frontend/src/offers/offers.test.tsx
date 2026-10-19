@@ -8,6 +8,7 @@ import Categories from "./Categories";
 import MerchantOffers from "./MerchantOffers";
 import OfferModeration from "./OfferModeration";
 import OfferBrowser from "./OfferBrowser";
+import ShopperHeader from "../shopper/ShopperHeader";
 import OfferDetail from "./OfferDetail";
 import type { Offer } from "./types";
 vi.mock("../auth/client", () => ({ authorized: vi.fn(), raw: vi.fn() }));
@@ -371,7 +372,15 @@ it("public offer details show complete terms without claiming a coupon", async (
   );
   setup(
     <Routes>
-      <Route path="/offers/:id" element={<OfferDetail />} />
+      <Route
+        path="/offers/:id"
+        element={
+          <>
+            <ShopperHeader />
+            <OfferDetail />
+          </>
+        }
+      />
     </Routes>,
     "/offers/o1?store_id=s1",
   );
@@ -397,7 +406,15 @@ it("expired offer detail returns an unavailable state", async () => {
   );
   setup(
     <Routes>
-      <Route path="/offers/:id" element={<OfferDetail />} />
+      <Route
+        path="/offers/:id"
+        element={
+          <>
+            <ShopperHeader />
+            <OfferDetail />
+          </>
+        }
+      />
     </Routes>,
     "/offers/o1",
   );

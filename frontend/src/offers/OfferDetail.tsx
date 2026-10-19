@@ -5,7 +5,6 @@ import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { raw } from "../auth/client";
 import { useAuth } from "../auth/AuthProvider";
-import { homePaths } from "../auth/types";
 import { QueryState } from "../profiles/shared";
 import { discountLabel, type PublicOffer } from "./types";
 export default function OfferDetail() {
@@ -25,26 +24,6 @@ export default function OfferDetail() {
   const offer = query.data;
   return (
     <>
-      <header className="header">
-        <Link className="brand" to="/">
-          ✳ nearperk.
-        </Link>
-        <nav>
-          <Link to="/">Discover</Link>
-          <Link
-            to={
-              auth.user
-                ? homePaths[auth.user.role]
-                : "/login?returnTo=" +
-                  encodeURIComponent(
-                    `/offers/${id}${store ? "?store_id=" + store : ""}`,
-                  )
-            }
-          >
-            {auth.user ? "My account" : "Sign in"}
-          </Link>
-        </nav>
-      </header>
       <main className="container offer-detail">
         <Link className="text-button" to="/#discover">
           ← Browse local offers

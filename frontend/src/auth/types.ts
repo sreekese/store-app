@@ -46,6 +46,7 @@ export function safeReturnTo(role: Role, value: string | null): string {
   if (parsed.origin !== "https://nearperk.invalid") return homePaths[role];
   if (
     parsed.pathname === "/app" ||
+    parsed.pathname === "/app/profile" ||
     parsed.pathname === "/app/notifications" ||
     /^\/app\/support(?:\/[a-zA-Z0-9-]+)?$/.test(parsed.pathname) ||
     /^\/app\/coupons(?:\/[a-zA-Z0-9-]+)?$/.test(parsed.pathname) ||

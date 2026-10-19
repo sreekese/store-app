@@ -186,3 +186,134 @@
     padding: 28px;
   }
 }
+.shopper-design .account-menu {
+  position: relative;
+}
+.shopper-design .account-menu-toggle {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 10px 16px;
+  background: var(--theme-surface, #fffaf5);
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+}
+.shopper-design .account-menu-links {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  z-index: 50;
+  width: min(260px, calc(100vw - 40px));
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--theme-surface, #fffaf5);
+  color: var(--ink);
+  box-shadow: 0 12px 32px #0002;
+  display: grid;
+  gap: 4px;
+}
+.shopper-design .header nav .account-menu-links a,
+.shopper-design .account-menu-links button {
+  display: block;
+  padding: 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  text-decoration: none;
+}
+.shopper-design .account-menu-links a:hover,
+.shopper-design .account-menu-links button:hover {
+  background: var(--line);
+  color: var(--ink);
+}
+.shopper-design .account-menu-links p {
+  padding: 8px;
+  margin: 0;
+}
+
+/* Account actions share touch targets and remain readable in both themes. */
+.shopper-account-page main :is(.button, button:not([class])) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  max-width: 100%;
+  padding: 11px 18px;
+  border: 1px solid var(--teal);
+  border-radius: 12px;
+  background: var(--teal);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: center;
+  text-decoration: none;
+  white-space: normal;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+.shopper-account-page
+  main
+  :is(.button, button:not([class])):hover:not(:disabled) {
+  background: #652936;
+  border-color: #652936;
+  color: #fff;
+}
+.shopper-account-page main .button.secondary {
+  background: var(--theme-surface, #fffaf5);
+  border-color: var(--line);
+  color: var(--ink);
+}
+.shopper-account-page main .button.secondary:hover:not(:disabled) {
+  background: var(--line);
+  border-color: var(--ink);
+  color: var(--ink);
+}
+.shopper-account-page main :is(.button, button:not([class])):disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.shopper-account-page main .category-pills button {
+  background: var(--theme-surface, #fffaf5);
+  border-color: var(--line);
+  color: var(--ink);
+  border-radius: 999px;
+}
+.shopper-account-page main .category-pills button[aria-pressed="true"] {
+  background: var(--teal);
+  border-color: var(--teal);
+  color: #fff;
+}
+.shopper-account-page .auth-form > .button,
+.shopper-account-page .auth-form .action-row .button {
+  width: auto;
+  justify-self: start;
+  margin: 0;
+}
+.shopper-account-page .profile-form fieldset {
+  display: grid;
+  gap: 16px;
+}
+.shopper-account-page main > button,
+.shopper-account-page main > label + button,
+.shopper-account-page main > a + button {
+  margin: 12px 0;
+}
+.shopper-account-page main > a + button {
+  margin-left: 12px;
+}
+@media (max-width: 560px) {
+  .shopper-account-page .action-row {
+    gap: 10px;
+  }
+  .shopper-account-page .auth-form .action-row .button {
+    flex: 1 1 120px;
+  }
+}

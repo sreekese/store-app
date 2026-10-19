@@ -138,12 +138,14 @@ export default function Inbox({ role }: { role: Role }) {
   });
   return (
     <>
-      <header className="header">
-        <Link className="brand" to={homePaths[role]}>
-          ✳ nearperk.
-        </Link>
-        <Link to={homePaths[role]}>Back to dashboard</Link>
-      </header>
+      {role !== "USER" && (
+        <header className="header">
+          <Link className="brand" to={homePaths[role]}>
+            ✳ nearperk.
+          </Link>
+          <Link to={homePaths[role]}>Back to dashboard</Link>
+        </header>
+      )}
       <main className="container workspace-shell">
         <h1>Notifications</h1>
         <section className="account-panel notification-inbox">

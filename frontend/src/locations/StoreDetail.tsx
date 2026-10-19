@@ -1,5 +1,5 @@
 import { TrackView } from "../analytics/tracking";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { raw } from "../auth/client";
 import { QueryState, type Hours } from "../profiles/shared";
@@ -28,15 +28,6 @@ export default function StoreDetail() {
   const store = query.data;
   return (
     <>
-      <header className="header">
-        <Link className="brand" to="/">
-          ✳ nearperk.
-        </Link>
-        <nav>
-          <Link to="/">Discover</Link>
-          <Link to="/app/coupons">My coupons</Link>
-        </nav>
-      </header>
       <main className="container workspace-shell">
         <QueryState
           pending={query.isPending}
